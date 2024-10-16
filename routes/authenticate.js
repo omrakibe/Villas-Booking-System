@@ -28,7 +28,7 @@ router.post(
         res.redirect("/listings");
       });
     } catch (err) {
-      req.flash("error", err.message);
+      req.flash("error", err.message); 
       res.redirect(res.locals.redirectUrl);
     }
   })
