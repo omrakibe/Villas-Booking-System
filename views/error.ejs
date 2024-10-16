@@ -1,0 +1,15 @@
+<% layout("/layouts/boilerplate") %>
+
+<br />
+<div class="row">
+  <div
+    class="alert alert-danger d-flex align-items-center col-6 offset-3"
+    role="alert"
+  >
+    <div>
+      <h4><%= err.name %></h4>
+      <p><%= message %></p>
+      <p><%= err.stack %></p>
+    </div>
+  </div>
+</div>

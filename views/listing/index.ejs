@@ -1,0 +1,47 @@
+<% layout("/layouts/boilerplate") %>
+<body>
+  <div id="home_page">
+    <div id="heading">
+      <h1 style="border-radius: 20px">All Listings</h1>
+    </div>
+    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
+      <% for (listings of listing) { %>
+      <a href="/listings/<%= listings._id %>">
+        <div class="card col listing-card">
+          <img
+            src="<%= listings.image.url %>"
+            class="card-img-top"
+            alt="listing_image"
+            style="height: 20rem"
+          />
+          <div class="card-img-overlay"></div>
+          <div class="card-body">
+            <h2 class="element">
+              Title:
+              <div id="heading2"><%= listings.title %></div>
+            </h2>
+            <!-- <p class="element">
+              <b> Discription: </b> <%= listings.description %>
+            </p> -->
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <b>Price: </b>
+              &#x20b9; <%= listings.price.toLocaleString("en-IN") %> per night
+            </li>
+            <!-- <li class="list-group-item">
+              <b>Location: </b> <%= listings.location %>
+            </li> -->
+            <li class="list-group-item">
+              <b>Country: </b> <%= listings.country %>
+            </li>
+          </ul>
+        </div>
+      </a>
+      <% } %>
+    </div>
+    <form action="/listings/new" method="GET">
+      <button id="create_btn">Create New!!</button>
+    </form>
+  </div>
+</body>

@@ -1,0 +1,180 @@
+body {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: weight;
+  font-style: normal;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  flex: 1;
+}
+
+#heading {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+h1 {
+  background-color: antiquewhite;
+  text-align: center;
+}
+
+a {
+  color: chocolate;
+  text-decoration: none;
+}
+
+#heading2 {
+  color: chocolate;
+}
+#heading2show {
+  font-size: 50px;
+  color: chocolate;
+  text-align: center;
+}
+
+li {
+  text-decoration: underline 2px rgb(175, 143, 143);
+  font-size: 1.3rem;
+}
+
+button {
+  color: rgb(34, 23, 23);
+  background-color: rgba(240, 248, 255, 0.568);
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #d32f2f;
+}
+
+#create_btn {
+  margin-bottom: 60px;
+  width: 100%;
+  text-align: center;
+}
+#create_btn:hover {
+  background-color: #36cbe8;
+}
+
+#edit_btn:hover {
+  background-color: #eedf11;
+}
+
+#submit_btn:hover {
+  background-color: #5bdd4482;
+}
+
+#login_btn:hover {
+  background-color: rgb(149, 194, 209);
+}
+
+.navbar {
+  height: 90px;
+  background-color: aliceblue;
+  opacity: 0.9;
+}
+
+.navbar-brand {
+  font-size: 38px;
+  color: rgb(219, 41, 41);
+  font-weight: bolder;
+}
+
+.navbar-brand:hover {
+  color: rgb(219, 41, 41);
+}
+
+.nav-link {
+  color: #222222 !important;
+}
+
+/* footer */
+.f-info-links {
+  margin-bottom: 5px;
+}
+
+.f-info-links a {
+  color: #222222;
+  padding: 5px;
+}
+
+.f-info-links a:hover {
+  text-decoration: underline;
+}
+
+.f-info-socials,
+.f-info-links {
+  width: 100%;
+}
+.f-info-socials i {
+  font-size: 1.35rem;
+  padding: 0.4rem;
+  cursor: pointer;
+}
+
+.f-info {
+  text-align: center;
+  height: 125px;
+  display: flex;
+  background-color: aliceblue;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Cards */
+.listing-card {
+  border: none !important;
+  margin: 1rem;
+}
+
+.card-img-top {
+  border-radius: 1rem !important;
+  width: 100% !important;
+  object-fit: cover !important;
+}
+
+.card-body {
+  padding: 0;
+}
+.card-img-overlay {
+  opacity: 0;
+}
+.card-img-overlay:hover {
+  opacity: 0.2;
+  background-color: white;
+}
+
+/* Show Page */
+.show-img {
+  height: 50vh;
+}
+
+input[type="range"] {
+  accent-color: coral;
+}
+
+/* signup */
+.signup-btn {
+  width: 416px;
+}
+
+/* @media screen and (max-width: 1024px) {
+  .signup-btn {
+    width: 295px;
+  }
+} */
+
+.authentication {
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+}
