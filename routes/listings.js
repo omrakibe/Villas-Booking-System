@@ -1,20 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const asyncWrap = require("../utils/wrapAsync.js");
-const { listingSchema } = require("../schema.js");
-const expressError = require("../utils/expressError.js");
 const Listing = require("../models/listing.js");
-const { isLoggedIn, isOwner, isOwnerDel } = require("../middleware.js");
-
-const validateListing = (req, res, next) => {
-  let { error } = listingSchema.validate(req.body);
-  if (error) {
-    let errMsg = error.details.map((el) => el.message).join(",");
-    throw new expressError(400, errMsg);
-  } else {
-    next();
-  }
-};
+const {
+  isLoggedIn,
+  isOwner,
+  isOwnerDel,
+  validateListing,
+} = require("../middleware.js");
 
 //Index Route
 router.get(
@@ -36,7 +29,7 @@ router.get(
   asyncWrap(async (req, res, next) => {
     let { id } = req.params;
     const listings = await Listing.findById(id)
-      .populate("reviews")
+      .populate({ path: "reviews", populate: { path: "author" } })
       .populate("owner");
 
     if (!listings) {

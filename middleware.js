@@ -1,4 +1,6 @@
 const Listing = require("./models/listing.js");
+const { listingSchema, reviewSchema } = require("./schema.js");
+const expressError = require("./utils/expressError.js");
 
 //this function is used to see whether user is logged in or not
 module.exports.isLoggedIn = (req, res, next) => {
@@ -8,7 +10,7 @@ module.exports.isLoggedIn = (req, res, next) => {
   req.session.redirectUrl = req.originalUrl;
 
   if (!req.isAuthenticated()) {
-    req.flash("error", "User is not Logged in to Create Listing!!");
+    req.flash("error", "User is not Logged In!!");
     return res.redirect("/login");
   }
   next();
@@ -28,6 +30,7 @@ module.exports.isOwner = async (req, res, next) => {
     req.flash("error", "You don't have access to Edit Listing");
     return res.redirect(`/listings/${id}`);
   }
+  next();
 };
 
 module.exports.isOwnerDel = async (req, res, next) => {
@@ -36,5 +39,27 @@ module.exports.isOwnerDel = async (req, res, next) => {
   if (!listing.owner.equals(res.locals.curUser._id)) {
     req.flash("error", "You don't have access to Delete Listing");
     return res.redirect(`/listings/${id}`);
+  }
+
+  next();
+};
+
+module.exports.validateListing = async (req, res, next) => {
+  let { error } = listingSchema.validate(req.body);
+  if (error) {
+    let errMsg = error.details.map((el) => el.message).join(",");
+    throw new expressError(400, errMsg);
+  } else {
+    next();
+  }
+};
+
+module.exports.validateReview = (req, res, next) => {
+  let { error } = reviewSchema.validate(req.body);
+  if (error) {
+    let errMsg = error.details.map((el) => el.message).join(",");
+    throw new expressError(400, errMsg);
+  } else {
+    next();
   }
 };

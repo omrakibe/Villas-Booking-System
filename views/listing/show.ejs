@@ -66,9 +66,10 @@
         </div>
       </div>
     </div>
-    <hr />
-    <hr />
 
+    <% if (curUser) {%>
+    <hr />
+    <hr />
     <br />
     <div class="col-8 offset-2">
       <h3>Leave your Review here :</h3>
@@ -105,6 +106,9 @@
 
         <button id="submit_btn">Submit</button>
       </form>
+
+      <% } %>
+
       <hr />
       <br />
       <h3>Reviews :</h3>
