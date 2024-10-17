@@ -4,7 +4,11 @@ const asyncWrap = require("../utils/wrapAsync.js");
 const Review = require("../models/review.js");
 const Listing = require("../models/listing.js");
 const expressError = require("../utils/expressError.js");
-const { isLoggedIn, validateReview } = require("../middleware.js");
+const {
+  isLoggedIn,
+  validateReview,
+  isReviewAuthor,
+} = require("../middleware.js");
 
 //Review
 //Post Route
@@ -19,7 +23,6 @@ router.post(
     let newReview = new Review(req.body.review);
 
     newReview.author = req.user._id;
-    console.log(newReview);
 
     listing.reviews.push(newReview);
     await newReview.save();
@@ -33,6 +36,7 @@ router.post(
 router.delete(
   "/:reviewId",
   isLoggedIn,
+  isReviewAuthor,
   asyncWrap(async (req, res, next) => {
     let { id, reviewId } = req.params;
 

@@ -2,12 +2,7 @@ const express = require("express");
 const router = express.Router();
 const asyncWrap = require("../utils/wrapAsync.js");
 const Listing = require("../models/listing.js");
-const {
-  isLoggedIn,
-  isOwner,
-  isOwnerDel,
-  validateListing,
-} = require("../middleware.js");
+const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
 
 //Index Route
 router.get(
@@ -94,7 +89,7 @@ router.put(
 router.delete(
   "/:id",
   isLoggedIn,
-  isOwnerDel,
+  isOwner,
   asyncWrap(async (req, res, next) => {
     let { id } = req.params;
     await Listing.findByIdAndDelete(id);

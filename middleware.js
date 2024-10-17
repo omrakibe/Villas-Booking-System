@@ -1,4 +1,5 @@
 const Listing = require("./models/listing.js");
+const Review = require("./models/review.js");
 const { listingSchema, reviewSchema } = require("./schema.js");
 const expressError = require("./utils/expressError.js");
 
@@ -27,20 +28,9 @@ module.exports.isOwner = async (req, res, next) => {
   let { id } = req.params;
   let listing = await Listing.findById(id);
   if (!listing.owner.equals(res.locals.curUser._id)) {
-    req.flash("error", "You don't have access to Edit Listing");
+    req.flash("error", "You don't have Access");
     return res.redirect(`/listings/${id}`);
   }
-  next();
-};
-
-module.exports.isOwnerDel = async (req, res, next) => {
-  let { id } = req.params;
-  let listing = await Listing.findById(id);
-  if (!listing.owner.equals(res.locals.curUser._id)) {
-    req.flash("error", "You don't have access to Delete Listing");
-    return res.redirect(`/listings/${id}`);
-  }
-
   next();
 };
 
@@ -62,4 +52,15 @@ module.exports.validateReview = (req, res, next) => {
   } else {
     next();
   }
+};
+
+module.exports.isReviewAuthor = async (req, res, next) => {
+  let { id, reviewId } = req.params;
+  let review = await Review.findById(reviewId);
+  let listing = await Listing.findById(id);
+  if (!review.author.equals(res.locals.curUser._id)) {
+    req.flash("error", "You don't have access to delete Review");
+    return res.redirect(`/listings/${id}`);
+  }
+  next();
 };

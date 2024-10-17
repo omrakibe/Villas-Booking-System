@@ -11,6 +11,8 @@ body {
 
 .container {
   flex: 1;
+  max-width: 175vh;
+  max-height: 150vw;
 }
 
 #heading {
@@ -24,7 +26,7 @@ h1 {
 }
 
 a {
-  color: chocolate;
+  color: rgb(219, 41, 41) !important;
   text-decoration: none;
 }
 
@@ -167,12 +169,6 @@ input[type="range"] {
 .signup-btn {
   width: 416px;
 }
-
-/* @media screen and (max-width: 1024px) {
-  .signup-btn {
-    width: 295px;
-  }
-} */
 
 .authentication {
   border: 2px solid rgba(0, 0, 0, 0.2);
