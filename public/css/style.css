@@ -12,7 +12,6 @@ body {
 .container {
   flex: 1;
   max-width: 175vh;
-  max-height: 150vw;
 }
 
 #heading {
@@ -130,7 +129,7 @@ button:hover {
   background-color: aliceblue;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
+  /* align-items: center; */
 }
 
 /* Cards */
