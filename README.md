@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-
-=======
-# # Villa Uploding site for Hotel Owners
->>>>>>> origin/main
+# Villa Uploding site for Hotel Owner
