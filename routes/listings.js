@@ -1,14 +1,17 @@
-if (process.env.NODE_ENV != "production") {
-  const dotenv = require("dotenv");
-  dotenv.config();
-}
+require("dotenv").config();
 
 const express = require("express");
 const router = express.Router();
 const asyncWrap = require("../utils/wrapAsync.js");
 const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
 const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+
+//from cloudConfig
+const { storage } = require("../cloudConfig.js");
+
+//this is to upload img in cloudinary storage
+const upload = multer({ storage });
+
 //Controller
 const listingController = require("../controler/listing.js");
 
@@ -16,10 +19,12 @@ const listingController = require("../controler/listing.js");
 router
   .route("/")
   .get(asyncWrap(listingController.index))
-  // .post(validateListing, isLoggedIn, asyncWrap(listingController.create));
-  .post(upload.single("listing[image][url]"), (req, res) => {
-    res.send(req.file);
-  });
+  .post(
+    upload.single("listing[image]"),
+    validateListing,
+    isLoggedIn,
+    asyncWrap(listingController.create)
+  );
 
 // New Route
 router.get("/new", isLoggedIn, listingController.new);
@@ -29,9 +34,10 @@ router
   .route("/:id")
   .get(asyncWrap(listingController.show))
   .put(
-    validateListing,
     isLoggedIn,
     isOwner,
+    upload.single("listing[image]"),
+    validateListing,
     asyncWrap(listingController.update)
   )
   .delete(isLoggedIn, isOwner, asyncWrap(listingController.destroy));

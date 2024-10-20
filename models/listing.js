@@ -12,17 +12,8 @@ const listingSchema = new Schema({
     type: String,
   },
   image: {
-    filename: {
-      type: String,
-    },
-    url: {
-      type: String,
-      set: function (v) {
-        return v === ""
-          ? "https://th.bing.com/th/id/OIP.WaXJnwHDuE7_rHoKjQpO8QAAAA?rs=1&pid=ImgDetMain"
-          : v;
-      },
-    },
+    url: String,
+    filename: String,
   },
   price: {
     type: Number,
@@ -36,7 +27,6 @@ const listingSchema = new Schema({
     required: true,
   },
   reviews: [
-    
     {
       type: Schema.Types.ObjectId,
       ref: "Review",

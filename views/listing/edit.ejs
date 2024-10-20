@@ -5,12 +5,12 @@
       <br>
       <div class="row">
         <div class="col-8 offset-2">
-          <h2>ID: <u> <%= listing._id %></u></h2>
+          <h2><u> <%= listing.owner.username %></u> Listing</h2>
 
           <br>
           <br>
 
-          <form action="/listings/<%= listing._id %>?_method=PUT" method="POST" novalidate class= "needs-validation">
+          <form action="/listings/<%= listing._id %>?_method=PUT" method="POST" novalidate class= "needs-validation" enctype="multipart/form-data">
             <div class="mb-3">
               <label for="title" class="form-label">Title: </label>
               <input type="text" value="<%= listing.title %>" name="listing[title]" class="form-control" required/>
@@ -36,8 +36,8 @@
             <br /> 
 
             <div class="mb-3">
-              <label for="image" class="form-label">Image URL/Link: </label>
-              <input type="text" value="<%= listing.image.url %>" name="listing[image][url]" class="form-control"/>
+              <label for="image" class="form-label">Upload new Image: </label>
+              <input type="file" name="listing[image]" class="form-control" />
             </div>
 
             <br />

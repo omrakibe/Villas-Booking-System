@@ -23,11 +23,15 @@ module.exports.show = async (req, res, next) => {
 };
 
 module.exports.create = async (req, res, next) => {
+  let url = req.file.path;
+  let filename = req.file.filename;
+
   // let { title, description, price, location, country } = req.body;
   let listing = req.body.listing;
-  // console.log(listing);
 
   listing.owner = req.user._id;
+
+  listing.image = { url, filename };
 
   const listings = new Listing(listing);
   await listings.save();
@@ -37,7 +41,7 @@ module.exports.create = async (req, res, next) => {
 
 module.exports.edit = async (req, res, next) => {
   let { id } = req.params;
-  let listing = await Listing.findById(id);
+  let listing = await Listing.findById(id).populate("owner");
   if (!listing) {
     req.flash("error", "Listing you requested for does not Exists!!");
     res.redirect("/listings");
@@ -50,7 +54,16 @@ module.exports.update = async (req, res, next) => {
     throw new Error(400, "Bad Request!!");
   }
   let { id } = req.params;
-  await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+
+  let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+
+  if (typeof req.file !== "undefined") {
+    let url = req.file.path;
+    let filename = req.file.filename;
+    listing.image = { url, filename };
+    await listing.save();
+  }
+
   res.redirect(`/listings/${id}`);
 };
 

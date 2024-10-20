@@ -66,20 +66,6 @@ app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
-// app.get("/demouser", async (req, res) => {
-//   let fakeUser = new User({
-//     email: "student@gmail.com",
-//     username: "Student",
-//   });
-//   const registerUser = await User.register(fakeUser, "HelloWorld");
-//   res.send(registerUser);
-// });
-
-// app.get("/listings", async (req, res) => {
-//   const isLoggedIn = req.isAuthenticated();
-//   res.render("layouts/boilerplate.ejs", { isLoggedIn });
-// });
-
 app.get("/", (req, res) => {
   res.render("home.ejs");
 });
