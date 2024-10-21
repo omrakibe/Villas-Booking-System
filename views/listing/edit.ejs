@@ -22,7 +22,7 @@
               </div>
             </div>
             <br />
-            <div class="mb-3">
+            <div >
               <label for="description" class="form-label">Description: </label>
               <textarea name="listing[description]" id="description" class="form-control" required><%= listing.description %></textarea>
               <div class="valid-feedback">
@@ -33,13 +33,13 @@
               </div>
             </div>
             
-            <br /> 
+            <br>
 
             <div>
               Original Listing Image: <br>
               <img src="<%= originalImageUrl %>" alt="listing_img">
             </div>
-
+            <br>
             <div class="mb-3">
               <label for="image" class="form-label">Upload new Image: </label>
               <input type="file" name="listing[image]" class="form-control" />
