@@ -18,26 +18,16 @@
 }
 
 .inside-container {
-  display: flex;
+  /* display: flex; */
   justify-content: center;
   padding: 100px 0;
   border-radius: 50px;
-  /* align-items: center; */
-  width: 50vw;
   background-color: #fff7d1;
-}
-
-.headingDiv {
-  color: brown;
-  font-size: larger;
-  height: 30vh;
-  display: flex;
-  align-items: center;
 }
 
 #namste {
   display: flex;
-  align-items: center;
+  justify-content: center;
   font-size: 200px;
 }
 
@@ -45,7 +35,7 @@
   font-size: 25px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* justify-content: center; */
   gap: 40px;
 }
 
@@ -60,4 +50,10 @@
   opacity: 0.5;
   text-align: justify;
   padding: 0 25px;
+}
+
+@media (max-width: 425px) {
+  #mainDiv {
+    background-color: aqua;
+  }
 }
