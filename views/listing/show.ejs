@@ -63,10 +63,15 @@
           </form>
           <br />
           <br />
-          <br />
         </div>
       </div>
     </div>
+
+    <div class="col-8 offset-2">
+      <h3>Where you’ll be:</h3>
+      <div id="map"></div>
+    </div>
+    <br />
 
     <% if (curUser) {%>
     <hr />
@@ -146,8 +151,10 @@
 
       <% } %>
 
-      <hr />
       <br />
+
+      <% if(listings.reviews.length > 0) { %>
+      <hr />
       <h3>Reviews :</h3>
 
       <div class="row">
@@ -179,7 +186,17 @@
         </div>
         <% } %>
       </div>
+      <% } %>
     </div>
   </div>
   <br />
 </body>
+
+<script>
+  mapboxgl.accessToken = "<%= process.env.MAP_TOKEN %>";
+  const map = new mapboxgl.Map({
+    container: "map", // container ID
+    center: [75.34, 19.84], // starting position [lng, lat]. Note that lat must be set between -90 and 90
+    zoom: 7, // starting zoom
+  });
+</script>
