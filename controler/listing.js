@@ -46,8 +46,8 @@ module.exports.create = async (req, res, next) => {
   listing.geometry = response.body.features[0].geometry;
 
   const listings = new Listing(listing);
-  let newListing = await listings.save();
-  console.log(newListing);
+  await listings.save();
+
   req.flash("success", "New Listing Created!!");
   res.redirect("/listings");
 };
@@ -73,6 +73,16 @@ module.exports.update = async (req, res, next) => {
   let { id } = req.params;
 
   let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+
+  let response = await geocodingClient
+    .forwardGeocode({
+      query: req.body.listing.location,
+      limit: 1,
+    })
+    .send();
+
+  listing.geometry = response.body.features[0].geometry;
+  await listing.save();
 
   if (typeof req.file !== "undefined") {
     let url = req.file.path;

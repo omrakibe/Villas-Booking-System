@@ -2,6 +2,7 @@
 
 <script>
   const mapToken = "<%= process.env.MAP_TOKEN %>";
+  const listings = <%- JSON.stringify(listings) %>;
 </script>
 
 <body>
@@ -70,7 +71,7 @@
     </div>
 
     <div class="col-8 offset-2 mb-5">
-      <h3>Where you’ll be:</h3>
+      <h3>Where you'll be:</h3>
       <div id="map"></div>
     </div>
 
