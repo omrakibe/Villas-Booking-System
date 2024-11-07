@@ -1,8 +1,71 @@
 <% layout("/layouts/boilerplate") %>
+
+<style>
+  #filters {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .filter {
+    color: #6a6a6a;
+    text-align: center;
+    margin: 2rem 3rem 0 0;
+  }
+  .filter:hover {
+    color: black;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  .icons {
+    font-size: 1.5rem;
+  }
+</style>
+
 <body>
   <div id="home_page">
+    <div id="filters">
+      <div class="filter">
+        <div class="icons"><i class="fa-brands fa-gripfire"></i></div>
+        <p>Trending</p>
+      </div>
+      <div class="filter">
+        <div class="icons"><i class="fa-solid fa-house-user"></i></div>
+        <p>Rooms</p>
+      </div>
+      <div class="filter">
+        <div class="icons"><i class="fa-solid fa-umbrella-beach"></i></div>
+        <p>Beachfront</p>
+      </div>
+      <div class="filter">
+        <div class="icons"><i class="fa-solid fa-person-swimming"></i></div>
+        <p>Amazing Pools</p>
+      </div>
+      <div class="filter">
+        <div class="icons"><i class="fa-brands fa-fort-awesome"></i></div>
+        <p>Castles</p>
+      </div>
+      <div class="filter">
+        <div class="icons"><i class="fa-solid fa-sailboat"></i></div>
+        <p>Boat House</p>
+      </div>
+      <div class="filter">
+        <div class="icons"><i class="fa-solid fa-golf-ball-tee"></i></div>
+        <p>Golfing</p>
+      </div>
+      <div class="filter">
+        <div class="icons"><i class="fa-solid fa-mountain"></i></div>
+        <p>Iconic Cities</p>
+      </div>
+      <div class="filter">
+        <div class="icons"><i class="fa-solid fa-place-of-worship"></i></div>
+        <p>Palaces</p>
+      </div>
+      <div class="filter">
+        <div class="icons"><i class="fa-solid fa-water"></i></div>
+        <p>Water House</p>
+      </div>
+    </div>
     <div id="heading">
-      <h1 style="border-radius: 20px">All Listings</h1>
+      <h1 style="border-radius: 20px">✨ V i l l a ' s ✨</h1>
     </div>
     <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
       <% for (listings of listing) { %>
