@@ -50,18 +50,17 @@ const listingSchema = new Schema({
   category: {
     type: String,
     enum: [
-      "Trending",
-      "Rooms",
-      "Beachfront",
-      "Amazing Pools",
-      "Castles",
-      "Boat House",
-      "Golfing",
-      "Iconic Cities",
-      "Palaces",
-      "Water House",
+      "trending",
+      "rooms",
+      "beachfront",
+      "amazingpools",
+      "castles",
+      "boathouse",
+      "golfing",
+      "iconiccities",
+      "palaces",
+      "waterhouse",
     ],
-    required: true,
   },
 });
 

@@ -1,0 +1,43 @@
+<% layout("/layouts/boilerplate") %>
+<div id="heading">
+    <h1 style="border-radius: 20px">✨ Trending &nbsp; V i l l a ' s ✨</h1>
+  </div>
+  <body>
+    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
+      <% for (listings of listing) { %>
+      <a href="/listings/<%= listings._id %>">
+        <div class="card col listing-card">
+          <img
+            src="<%= listings.image.url %>"
+            class="card-img-top"
+            alt="listing_image"
+            style="height: 27rem"
+          />
+          <div class="card-img-overlay"></div>
+          <div class="card-body">
+            <h2 class="element">
+              Title:
+              <div id="heading2"><%= listings.title %></div>
+            </h2>
+            <!-- <p class="element">
+                <b> Discription: </b> <%= listings.description %>
+              </p> -->
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <b>Price: </b>
+              &#x20b9; <%= listings.price.toLocaleString("en-IN") %> per night
+            </li>
+            <!-- <li class="list-group-item">
+                <b>Location: </b> <%= listings.location %>
+              </li> -->
+            <li class="list-group-item">
+              <b>Country: </b> <%= listings.country %>
+            </li>
+          </ul>
+        </div>
+      </a>
+      <% } %>
+    </div>
+  </body>
+</html>

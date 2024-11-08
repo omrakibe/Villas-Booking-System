@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-8 offset-2">
         <div id="heading">
-          <h1>Create &nbsp; New &nbsp; Listing  &nbsp; Here:</h1>
+          <h1>Add &nbsp; New &nbsp; Villa  &nbsp; Here:</h1>
         </div>
         <form action="/listings" method="POST" novalidate class="needs-validation" enctype="multipart/form-data">
           <label for="title" class="form-label">Title:</label>
@@ -40,14 +40,43 @@
               Please enter Short Description!!
             </div>
           </div>
-          <br />
           
-          <!-- <label for="image.url" class="form-label">Image URL:</label>
-          <input type="text" placeholder="image Url" name="listing[image][url]" class="form-control"/> -->
+          <br>
 
-          <label for="image.url" class="form-label">Upload Image:</label>
-          <input type="file" name="listing[image]" class="form-control" required/>
+          <div class="row">
+            <div class="col-md-5">
+              <label for="category" class="form-label">Category:</label>
+              <select name="listing[category]" id="category" class="form-control">
+                <option>Select Options : </option>
+                <option value="trending">Trending</option>
+                <option value="rooms">Rooms</option>
+                <option value="beachfront">Beachfront</option>
+                <option value="amazingpools">Amazing Pools</option>
+                <option value="castles">Castles</option>
+                <option value="boathouse">Boat House</option>
+                <option value="golfing">Golfing</option>
+                <option value="iconiccities">Iconic Cities</option>
+                <option value="palaces">Palaces</option>
+                <option value="waterhouse">Water House</option>
+              </select>
+              <div class="valid-feedback">
+                Nice!!
+              </div>
+              <div class="invalid-feedback">
+                Please enter Short Description!!
+              </div>
+            </div>
+
+            <!-- <label for="image.url" class="form-label">Image URL:</label>
+            <input type="text" placeholder="image Url" name="listing[image][url]" class="form-control"/> -->
+            <div class="col-md-4">
+              <label for="image.url" class="form-label">Upload Image:</label>
+              <input type="file" name="listing[image]" class="form-control" required/>
+            </div>
+          </div>
+
           <br />
+          <br>
           
           <div class="row">
             <div class="col-md-4">
@@ -60,8 +89,6 @@
               <div class="invalid-feedback">
                 Please enter Price!!
               </div>
-
-              <br />
               
             </div>
             
@@ -76,6 +103,8 @@
             </div>
           </div>          
           
+          <br>
+
           <div>
             <label for="country" class="form-label">Country:</label>
             <input

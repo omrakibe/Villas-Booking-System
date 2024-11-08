@@ -100,3 +100,8 @@ module.exports.destroy = async (req, res, next) => {
   req.flash("delete", "Listing Deleted!!");
   res.redirect("/listings");
 };
+
+module.exports.trending = async (req, res, next) => {
+  let listing = await Listing.find({ category: "trending" });
+  res.render("listing/trending.ejs", { listing });
+};
