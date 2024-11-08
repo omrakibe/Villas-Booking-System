@@ -26,8 +26,8 @@ router
     asyncWrap(listingController.create)
   );
 
-//trending villas
-router.get("/trendingvillas", asyncWrap(listingController.trending));
+// //trending villas
+// router.get("/", asyncWrap(listingController.trending));
 
 // New Route
 router.get("/new", isLoggedIn, listingController.new);
@@ -47,11 +47,5 @@ router
 
 //edit page
 router.get("/:id/edit", isLoggedIn, asyncWrap(listingController.edit));
-
-//trending villas
-router.get(
-  "/listings?category=trending",
-  asyncWrap(listingController.trending)
-);
 
 module.exports = router;

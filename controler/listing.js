@@ -5,7 +5,15 @@ const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
 module.exports.index = async (req, res, next) => {
   let listing = await Listing.find();
-  res.render("listing/index.ejs", { listing });
+
+  let category = req.query.category;
+  let filterListing = await Listing.find({ category: `${category}` });
+
+  if (category == undefined) {
+    res.render("listing/index.ejs", { listing, category });
+  } else {
+    res.render("listing/index.ejs", { filterListing, category });
+  }
 };
 
 module.exports.new = (req, res) => {
@@ -101,7 +109,9 @@ module.exports.destroy = async (req, res, next) => {
   res.redirect("/listings");
 };
 
-module.exports.trending = async (req, res, next) => {
-  let listing = await Listing.find({ category: "trending" });
-  res.render("listing/trending.ejs", { listing });
-};
+// module.exports.trending = async (req, res, next) => {
+//   let category = req.query.category;
+//   console.log(category);
+//   let listing = await Listing.find({ category: `${category}` });
+//   res.render("listing/filter.ejs", { listing, category });
+// };
