@@ -46,33 +46,61 @@
           <p>Beachfront</p>
         </div>
       </a>
-      <div class="filter">
-        <div class="icons"><i class="fa-solid fa-person-swimming"></i></div>
-        <p>Amazing Pools</p>
-      </div>
-      <div class="filter">
-        <div class="icons"><i class="fa-brands fa-fort-awesome"></i></div>
-        <p>Castles</p>
-      </div>
-      <div class="filter">
-        <div class="icons"><i class="fa-solid fa-sailboat"></i></div>
-        <p>Boat House</p>
-      </div>
-      <div class="filter">
-        <div class="icons"><i class="fa-solid fa-golf-ball-tee"></i></div>
-        <p>Golfing</p>
-      </div>
-      <div class="filter">
-        <div class="icons"><i class="fa-solid fa-mountain"></i></div>
-        <p>Iconic Cities</p>
-      </div>
-      <div class="filter">
-        <div class="icons"><i class="fa-solid fa-place-of-worship"></i></div>
-        <p>Palaces</p>
-      </div>
-      <div class="filter">
-        <div class="icons"><i class="fa-solid fa-water"></i></div>
-        <p>Water House</p>
+      <a href="/listings/?category=amazingpools">
+        <div class="filter">
+          <div class="icons"><i class="fa-solid fa-person-swimming"></i></div>
+          <p>Amazing Pools</p>
+        </div>
+      </a>
+      <a href="/listings/?category=castles">
+        <div class="filter">
+          <div class="icons"><i class="fa-brands fa-fort-awesome"></i></div>
+          <p>Castles</p>
+        </div>
+      </a>
+      <a href="/listings/?category=boathouse">
+        <div class="filter">
+          <div class="icons"><i class="fa-solid fa-sailboat"></i></div>
+          <p>Boat House</p>
+        </div>
+      </a>
+      <a href="/listings/?category=golfing">
+        <div class="filter">
+          <div class="icons"><i class="fa-solid fa-golf-ball-tee"></i></div>
+          <p>Golfing</p>
+        </div>
+      </a>
+      <a href="/listings/?category=iconiccities">
+        <div class="filter">
+          <div class="icons"><i class="fa-solid fa-mountain"></i></div>
+          <p>Iconic Cities</p>
+        </div>
+      </a>
+      <a href="/listings/?category=palaces">
+        <div class="filter">
+          <div class="icons"><i class="fa-solid fa-place-of-worship"></i></div>
+          <p>Palaces</p>
+        </div>
+      </a>
+      <a href="/listings/?category=waterhouse">
+        <div class="filter">
+          <div class="icons"><i class="fa-solid fa-water"></i></div>
+          <p>Water House</p>
+        </div>
+      </a>
+
+      <div class="tax-switch mt-5">
+        <div class="form-check form-switch form-check-reverse">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            role="switch"
+            id="flexSwitchCheckDefault"
+          />
+          <label class="form-check-label" for="flexSwitchCheckDefault"
+            >Display Price after Taxes</label
+          >
+        </div>
       </div>
     </div>
 
@@ -104,6 +132,7 @@
             <li class="list-group-item">
               <b>Price: </b>
               &#x20b9; <%= listings.price.toLocaleString("en-IN") %> per night
+              <i> &nbsp; +18% GST</i>
             </li>
             <!-- <li class="list-group-item">
               <b>Location: </b> <%= listings.location %>
@@ -114,9 +143,11 @@
           </ul>
         </div>
       </a>
-      <% } %> <% } else {%>
 
-      <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
+      <% } %> <% } else {%>
+      <hr />
+      <h2><%=category.charAt(0).toUpperCase() + category.slice(1)%> :</h2>
+      <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-2">
         <% for (listings of filterListing) { %>
         <a href="/listings/<%= listings._id %>">
           <div class="card col listing-card">
@@ -140,6 +171,7 @@
               <li class="list-group-item">
                 <b>Price: </b>
                 &#x20b9; <%= listings.price.toLocaleString("en-IN") %> per night
+                <i> &nbsp; +18% GST</i>
               </li>
               <!-- <li class="list-group-item">
                       <b>Location: </b> <%= listings.location %>
@@ -159,3 +191,10 @@
     </form>
   </div>
 </body>
+
+<script>
+  let taxSwitch = document.getElementById("flexSwitchCheckDefault");
+  taxSwitch.addEventListener("click", () => {
+    console.log("Button clicked");
+  });
+</script>
