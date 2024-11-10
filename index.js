@@ -16,7 +16,10 @@ const reviewRouter = require("./routes/reviews.js");
 const userRouter = require("./routes/authenticate.js");
 
 const expressError = require("./utils/expressError.js");
+
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
+
 const flash = require("connect-flash");
 const passport = require("passport");
 const localStrategy = require("passport-local");
@@ -29,11 +32,31 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.engine("ejs", ejsMate);
 
+const store = MongoStore.create({
+  mongoUrl: dbUrl,
+  crypto: {
+    secret: "helloworld!" 
+  },
+  touchAfter: 24 * 3600,
+})
+
+store.on("error", () => {
+  console.log("error in Mongo Session", err)
+})
+
 const sessionOption = {
+  store,
   secret: "helloworld!",
   resave: false,
   saveUninitialized: true,
+  cookie: {
+    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+  },
 };
+
+
 
 app.use(session(sessionOption));
 app.use(flash());
