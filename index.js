@@ -35,18 +35,18 @@ app.engine("ejs", ejsMate);
 const store = MongoStore.create({
   mongoUrl: dbUrl,
   crypto: {
-    secret: "helloworld!" 
+    secret: process.env.SECRET_CODE,
   },
   touchAfter: 24 * 3600,
-})
+});
 
 store.on("error", () => {
-  console.log("error in Mongo Session", err)
-})
+  console.log("error in Mongo Session", err);
+});
 
 const sessionOption = {
   store,
-  secret: "helloworld!",
+  secret: process.env.SECRET_CODE,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -55,8 +55,6 @@ const sessionOption = {
     httpOnly: true,
   },
 };
-
-
 
 app.use(session(sessionOption));
 app.use(flash());
