@@ -35,16 +35,42 @@
             
             <br>
 
-            <div>
-              Original Listing Image: <br>
-              <img src="<%= originalImageUrl %>" alt="listing_img">
-            </div>
-            <br>
-            <div class="mb-3">
-              <label for="image" class="form-label">Upload new Image: </label>
-              <input type="file" name="listing[image]" class="form-control" />
-            </div>
+            <div class="row">
 
+              <div>
+                Original Listing Image: <br>
+                <img src="<%= originalImageUrl %>" alt="listing_img">
+              </div>
+              <br>
+              <div class="mb-3 col-md-4">
+                <label for="image" class="form-label">Upload new Image: </label>
+                <input type="file" name="listing[image]" class="form-control" />
+              </div>
+
+              <div class="col-md-4">
+                <label for="category" class="form-label">Category:</label>
+                <select name="listing[category]" id="category" class="form-control" required>
+                  <option > <%= listing.category %> </option>
+                  <option value="trending">Trending</option>
+                  <option value="rooms">Rooms</option>
+                  <option value="beachfront">Beachfront</option>
+                  <option value="amazingpools">Amazing Pools</option>
+                  <option value="castles">Castles</option>
+                  <option value="boathouse">Boat House</option>
+                  <option value="golfing">Golfing</option>
+                  <option value="iconiccities">Iconic Cities</option>
+                  <option value="palaces">Palaces</option>
+                  <option value="waterhouse">Water House</option>
+                </select>
+                <div class="valid-feedback">
+                  Nice!!
+                </div>
+                <div class="invalid-feedback">
+                  Please enter Short Description!!
+                </div>
+              </div>
+
+            </div>
             <br />
             
             <div class="row">
