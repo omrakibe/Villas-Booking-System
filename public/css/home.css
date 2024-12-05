@@ -57,3 +57,7 @@
     background-color: aqua;
   }
 }
+
+button{
+  align-items: center;
+}

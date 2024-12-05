@@ -85,8 +85,6 @@ main()
 
 async function main() {
   await mongoose.connect(dbUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
     serverSelectionTimeoutMS: 20000, // 20 seconds
   });
 }
