@@ -2,3 +2,4 @@ classroom
 init
 .env
 node_modules
+.vercel
