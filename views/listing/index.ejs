@@ -117,51 +117,21 @@
       </div>
     </div>
 
-    <% if (category == undefined) { %>
-    <div id="heading">
-      <h1 style="border-radius: 20px">✨ V i l l a ' s ✨</h1>
-    </div>
-    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
-      <% for (listings of listing) { %>
-      <a href="/listings/<%= listings._id %>">
-        <div class="card col listing-card">
-          <img
-            src="<%= listings.image.url %>"
-            class="card-img-top"
-            alt="listing_image"
-            style="height: 27rem"
-          />
-          <div class="card-img-overlay"></div>
-          <div class="card-body">
-            <h2 class="element">
-              Title:
-              <div id="heading2"><%= listings.title %></div>
-            </h2>
-            <!-- <p class="element">
-              <b> Discription: </b> <%= listings.description %>
-            </p> -->
-          </div>
-          <ul class="list-group list-group-flush">
-            <li class="list-group-item">
-              <b>Price: </b>
-              &#x20b9; <%= listings.price.toLocaleString("en-IN") %> per night
-              <i class="tax-info"> &nbsp; +18% GST</i>
-            </li>
-            <!-- <li class="list-group-item">
-              <b>Location: </b> <%= listings.location %>
-            </li> -->
-            <li class="list-group-item">
-              <b>Country: </b> <%= listings.country %>
-            </li>
-          </ul>
-        </div>
-      </a>
+    <% if (noResults) { %>
+      <br>
+      <br>
+      <br>
+      <h2><%= noResults %></h2>
+      <% } else { %>
 
-      <% } %> <% } else {%>
-      <hr />
-      <h2><%=category.charAt(0).toUpperCase() + category.slice(1)%> :</h2>
-      <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-2">
-        <% for (listings of filterListing) { %>
+      <% if (category == undefined) { %>
+      <div id="heading">
+        <h1 style="border-radius: 20px">✨ V i l l a ' s ✨</h1>
+      </div>
+      <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
+
+        <% for (listings of listing) { %>
+
         <a href="/listings/<%= listings._id %>">
           <div class="card col listing-card">
             <img
@@ -177,8 +147,8 @@
                 <div id="heading2"><%= listings.title %></div>
               </h2>
               <!-- <p class="element">
-                      <b> Discription: </b> <%= listings.description %>
-                    </p> -->
+                <b> Discription: </b> <%= listings.description %>
+              </p> -->
             </div>
             <ul class="list-group list-group-flush">
               <li class="list-group-item">
@@ -187,18 +157,60 @@
                 <i class="tax-info"> &nbsp; +18% GST</i>
               </li>
               <!-- <li class="list-group-item">
-                      <b>Location: </b> <%= listings.location %>
-                    </li> -->
+                <b>Location: </b> <%= listings.location %>
+              </li> -->
               <li class="list-group-item">
                 <b>Country: </b> <%= listings.country %>
               </li>
             </ul>
           </div>
         </a>
-        <% } %>
-      </div>
-      <% } %>
+        <% } %> 
+        <%} else if (category) {%>
+        <hr />
+        <h2><%=category.charAt(0).toUpperCase() + category.slice(1)%> :</h2>
+        <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-2">
+          <% for (listings of filterListing) { %>
+          <a href="/listings/<%= listings._id %>">
+            <div class="card col listing-card">
+              <img
+                src="<%= listings.image.url %>"
+                class="card-img-top"
+                alt="listing_image"
+                style="height: 27rem"
+              />
+              <div class="card-img-overlay"></div>
+              <div class="card-body">
+                <h2 class="element">
+                  Title:
+                  <div id="heading2"><%= listings.title %></div>
+                </h2>
+                <!-- <p class="element">
+                        <b> Discription: </b> <%= listings.description %>
+                      </p> -->
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <b>Price: </b>
+                  &#x20b9; <%= listings.price.toLocaleString("en-IN") %> per night
+                  <i class="tax-info"> &nbsp; +18% GST</i>
+                </li>
+                <!-- <li class="list-group-item">
+                        <b>Location: </b> <%= listings.location %>
+                      </li> -->
+                <li class="list-group-item">
+                  <b>Country: </b> <%= listings.country %>
+                </li>
+              </ul>
+            </div>
+          </a>
+          <% } %>
+          <% } %>
+
+          <% } %>
     </div>
+    <br>
+    <br>
     <form action="/listings/new" method="GET">
       <button id="create_btn">Create New!!</button>
     </form>

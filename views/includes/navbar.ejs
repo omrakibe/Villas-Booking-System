@@ -19,6 +19,7 @@
   }
   .searchBar {
     margin-right: 10rem;
+    width: 20rem;
   }
 </style>
 <nav class="navbar navbar-expand-lg bg-body-light border-bottom sticky-top">
@@ -46,14 +47,15 @@
       </div>
 
       <div class="ms-auto me-5">
-        <nav class="bg-body-tertiary">
-          <div class="navbar-nav container-fluid searchBar">
-            <form class="d-flex" role="search">
+        <nav class="bg-body-tertiary searchBar">
+          <div class="navbar-nav container-fluid ">
+            <form class="d-flex" role="search" action="/listings">
               <input
                 class="form-control me-2 search-inp"
                 type="search"
                 placeholder="Search for Villa's"
                 aria-label="Search"
+                name="q"
               />
               <button class="btn btn-search" type="submit">
                 <i class="fa-solid fa-magnifying-glass"></i>
