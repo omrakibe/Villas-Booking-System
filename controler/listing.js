@@ -5,26 +5,26 @@ const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
 module.exports.index = async (req, res, next) => {
   let listing = await Listing.find(); //get all listings
-  let {q, category} = req.query;
-  
-  
+  let { q, category } = req.query;
+
   // let category = req.query.category;
   // let filterListing = await Listing.find({ category: `${category}` });
 
   let searchListing = [];
   let filterListing = [];
   let noResults = "";
-  
-  if(q) {
+
+  if (q) {
     let searchListingByTitle = await Listing.find({
       title: { $regex: `${q}`, $options: "i" },
     });
     let searchListingByCountry = await Listing.find({
       country: { $regex: `${q}`, $options: "i" },
     });
-  
-    
-  
+    let searchListingByLocation = await Listing.find({
+      location: { $regex: `${q}`, $options: "i" },
+    });
+
     // if(searchListingByCountry.length === 0) {
     //   searchListing = searchListingByTitle;
     // } else if (searchListingByTitle.length === 0) {
@@ -33,30 +33,46 @@ module.exports.index = async (req, res, next) => {
     //   searchListing = "No Such Villas Available";
     // }
 
-    if(searchListingByTitle.length === 0 && searchListingByCountry.length === 0) {
-      noResults = "No Such Villas Available."
+    if (
+      searchListingByTitle.length === 0 &&
+      searchListingByCountry.length === 0 &&
+      searchListingByLocation === 0
+    ) {
+      noResults = "No Such Villas Available.";
     } else {
-      searchListing = [...searchListingByTitle, ...searchListingByCountry] //ths will merge the result
+      searchListing = [
+        ...searchListingByTitle,
+        ...searchListingByCountry,
+        ...searchListingByLocation,
+      ]; //ths will merge the result
     }
     // res.render("listing/index.ejs", {searchListing, q, category})
   }
 
+  console.log(searchListing);
   
 
-  if(category) {
-    filterListing = listing.filter((listings) => listings.category === category);
-    if(filterListing.length === 0) {
-      noResults = "There is No villa in this Category."
+  if (category) {
+    filterListing = listing.filter(
+      (listings) => listings.category === category
+    );
+    if (filterListing.length === 0) {
+      noResults = "There is No villa in this Category.";
     }
   }
 
   res.render("listing/index.ejs", {
-    listing : searchListing.length > 0 ? searchListing : category ? filterListing : listing,
+    listing:
+      searchListing.length > 0
+        ? searchListing
+        : category
+        ? filterListing
+        : listing,
     filterListing,
     category,
     noResults,
     q,
-  })
+  });
 };
 
 module.exports.new = (req, res) => {
