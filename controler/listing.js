@@ -3,59 +3,31 @@ const mbxGeocoding = require("@mapbox/mapbox-sdk/services/geocoding");
 const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
-module.exports.index = async (req, res, next) => {
-  let listing = await Listing.find(); //get all listings
-  let { q, category } = req.query;
+const ADMIN_EMAIL = "omrakibe@greatpark.com"; // define once at top
 
-  // let category = req.query.category;
-  // let filterListing = await Listing.find({ category: `${category}` });
+// INDEX
+module.exports.index = async (req, res, next) => {
+  let listing = await Listing.find(); 
+  let { q, category } = req.query;
 
   let searchListing = [];
   let filterListing = [];
   let noResults = "";
 
   if (q) {
-    let searchListingByTitle = await Listing.find({
-      title: { $regex: `${q}`, $options: "i" },
-    });
-    let searchListingByCountry = await Listing.find({
-      country: { $regex: `${q}`, $options: "i" },
-    });
-    let searchListingByLocation = await Listing.find({
-      location: { $regex: `${q}`, $options: "i" },
-    });
+    let searchListingByTitle = await Listing.find({ title: { $regex: `${q}`, $options: "i" } });
+    let searchListingByCountry = await Listing.find({ country: { $regex: `${q}`, $options: "i" } });
+    let searchListingByLocation = await Listing.find({ location: { $regex: `${q}`, $options: "i" } });
 
-    // if(searchListingByCountry.length === 0) {
-    //   searchListing = searchListingByTitle;
-    // } else if (searchListingByTitle.length === 0) {
-    //   searchListing = searchListingByCountry
-    // } else {
-    //   searchListing = "No Such Villas Available";
-    // }
-
-    if (
-      searchListingByTitle.length === 0 &&
-      searchListingByCountry.length === 0 &&
-      searchListingByLocation === 0
-    ) {
-      noResults = "No Such Villas Available.";
+    if (searchListingByTitle.length === 0 && searchListingByCountry.length === 0 && searchListingByLocation.length === 0) {
+      noResults = "No Such Villa is Available.";
     } else {
-      searchListing = [
-        ...searchListingByTitle,
-        ...searchListingByCountry,
-        ...searchListingByLocation,
-      ]; //ths will merge the result
+      searchListing = [...searchListingByTitle, ...searchListingByCountry, ...searchListingByLocation];
     }
-    // res.render("listing/index.ejs", {searchListing, q, category})
   }
 
-  console.log(searchListing);
-  
-
   if (category) {
-    filterListing = listing.filter(
-      (listings) => listings.category === category
-    );
+    filterListing = listing.filter((listings) => listings.category === category);
     if (filterListing.length === 0) {
       noResults = "There is No villa in this Category.";
     }
@@ -72,13 +44,17 @@ module.exports.index = async (req, res, next) => {
     category,
     noResults,
     q,
+    curUser: req.user,
+    ADMIN_EMAIL
   });
 };
 
-module.exports.new = (req, res) => {
-  res.render("listing/new.ejs");
+// NEW FORM
+module.exports.renderNewForm = (req, res) => {
+  res.render("listing/new.ejs", { curUser: req.user, ADMIN_EMAIL });
 };
 
+// SHOW
 module.exports.show = async (req, res, next) => {
   let { id } = req.params;
   const listings = await Listing.findById(id)
@@ -87,29 +63,24 @@ module.exports.show = async (req, res, next) => {
 
   if (!listings) {
     req.flash("error", "Listing you requested for does not Exists!!");
-    res.redirect("/listings");
+    return res.redirect("/listings");
   }
-  res.render("listing/show.ejs", { listings });
+
+  res.render("listing/show.ejs", { listings, curUser: req.user, ADMIN_EMAIL });
 };
 
+// CREATE
 module.exports.create = async (req, res, next) => {
   let response = await geocodingClient
-    .forwardGeocode({
-      query: req.body.listing.location,
-      limit: 1,
-    })
+    .forwardGeocode({ query: req.body.listing.location, limit: 1 })
     .send();
 
   let url = req.file.path;
   let filename = req.file.filename;
 
-  // let { title, description, price, location, country } = req.body;
   let listing = req.body.listing;
-
   listing.owner = req.user._id;
-
   listing.image = { url, filename };
-
   listing.geometry = response.body.features[0].geometry;
 
   const listings = new Listing(listing);
@@ -119,20 +90,20 @@ module.exports.create = async (req, res, next) => {
   res.redirect("/listings");
 };
 
+// EDIT
 module.exports.edit = async (req, res, next) => {
   let { id } = req.params;
   let listing = await Listing.findById(id).populate("owner");
   if (!listing) {
     req.flash("error", "Listing you requested for does not Exists!!");
-    res.redirect("/listings");
+    return res.redirect("/listings");
   }
 
-  let originalImageUrl = listing.image.url;
-  originalImageUrl = originalImageUrl.replace("/upload", "/upload/h_200,w_300");
-
-  res.render("listing/edit.ejs", { listing, originalImageUrl });
+  let originalImageUrl = listing.image.url.replace("/upload", "/upload/h_200,w_300");
+  res.render("listing/edit.ejs", { listing, originalImageUrl, curUser: req.user, ADMIN_EMAIL });
 };
 
+// UPDATE
 module.exports.update = async (req, res, next) => {
   if (!req.body.listing) {
     throw new Error(400, "Bad Request!!");
@@ -142,10 +113,7 @@ module.exports.update = async (req, res, next) => {
   let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
 
   let response = await geocodingClient
-    .forwardGeocode({
-      query: req.body.listing.location,
-      limit: 1,
-    })
+    .forwardGeocode({ query: req.body.listing.location, limit: 1 })
     .send();
 
   listing.geometry = response.body.features[0].geometry;
@@ -161,16 +129,10 @@ module.exports.update = async (req, res, next) => {
   res.redirect(`/listings/${id}`);
 };
 
+// DESTROY
 module.exports.destroy = async (req, res, next) => {
   let { id } = req.params;
   await Listing.findByIdAndDelete(id);
   req.flash("delete", "Listing Deleted!!");
   res.redirect("/listings");
 };
-
-// module.exports.trending = async (req, res, next) => {
-//   let category = req.query.category;
-//   console.log(category);
-//   let listing = await Listing.find({ category: `${category}` });
-//   res.render("listing/filter.ejs", { listing, category });
-// };

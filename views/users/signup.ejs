@@ -1,53 +1,49 @@
-<% layout("/layouts/boilerplate") %>
+<% layout("layouts/boilerplate") %>
 
-<div class="row mt-5">
-  <div class="col-4 offset-4 authentication">
-    <a class="navbar-brand offset-3" href="/">
-      <span class="material-symbols-outlined"> linked_services </span>
-      <u>GreatPark</u></a
-    >
+<div class="d-flex justify-content-center align-items-center vh-100">
+  <div class="card shadow-lg p-4 rounded-4" style="width: 28rem;">
+    <h2 class="text-center mb-4">Create Account</h2>
 
-    <form action="/signup" method="POST" novalidate class="needs-validation">
-      <div>
-        <h3 class="mt-5" style="color: rgb(219, 41, 41)"><b>SignUp</b></h3>
-        <label for="username" class="form-label"> </label>
+    <form action="/signup" method="POST">
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
         <input
           type="text"
-          id="username"
-          placeholder="Username"
           name="username"
-          class="form-control mt-2"
-          required
-        />
-
-        <div class="invalid-feedback">Please enter Username!!</div>
-        <div>
-          <label for="email" class="form-label"> </label>
-          <input
-            type="text"
-            id="email"
-            placeholder="Email"
-            name="email"
-            class="form-control"
-            required
-          />
-          <div class="invalid-feedback">Please enter Email!!</div>
-        </div>
-
-        <label for="password" class="form-label"> </label>
-        <input
-          type="password"
-          id="password"
-          placeholder="Password"
-          name="password"
+          id="username"
           class="form-control"
           required
         />
-        <div class="invalid-feedback">Please enter Password!!</div>
-        <button id="submit_btn" class="mt-4 signup-btn">SignUp</button>
       </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          name="email"
+          id="email"
+          class="form-control"
+          required
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          name="password"
+          id="password"
+          class="form-control"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn btn-dark w-100">Sign Up</button>
     </form>
-    <br />
-    <p>If User already exists, <a href="/login">Login</a></p>
+
+    <p class="mt-3 text-center">
+      Already have an account?
+      <a href="/login" class="text-decoration-none">Login here</a>
+    </p>
   </div>
 </div>

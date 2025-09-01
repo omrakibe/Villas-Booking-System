@@ -1,9 +1,14 @@
 const User = require("../models/user.js");
+const ADMIN_EMAIL = "omrakibe@greatpark.com";
 
 module.exports.signUp = async (req, res) => {
   try {
     let { username, email, password } = req.body;
-    const newUser = new User({ email, username });
+
+    const role = email === ADMIN_EMAIL ? "admin" : "user";
+
+
+    const newUser = new User({ email, username, role });
     let registerUser = await User.register(newUser, password);
 
     //This is used automatic login for user after signup.
@@ -11,12 +16,12 @@ module.exports.signUp = async (req, res) => {
       if (err) {
         return next(err);
       }
-      req.flash("success", "Welcome to GreatPark!!");
+      req.flash("success", `Welcome ${role === "admin" ? "Admin" : "User"}!`);
       res.redirect("/listings");
     });
   } catch (err) {
     req.flash("error", err.message);
-    res.redirect(res.locals.redirectUrl);
+    res.redirect("/signup");
   }
 };
 

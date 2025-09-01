@@ -1,51 +1,55 @@
 require("dotenv").config();
-
 const express = require("express");
 const router = express.Router();
 const asyncWrap = require("../utils/wrapAsync.js");
-const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
+const { isLoggedIn, isAdmin, validateListing } = require("../middleware.js");
 const multer = require("multer");
 
-//from cloudConfig
+// from cloudConfig
 const { storage } = require("../cloudConfig.js");
-
-//this is to upload img in cloudinary storage
 const upload = multer({ storage });
 
-//Controller
+// Controller
 const listingController = require("../controler/listing.js");
 
-//Index, Create Routes
+// ✅ Index (all users can view), Create (only Admin)
 router
   .route("/")
-  .get(asyncWrap(listingController.index))
+  .get(asyncWrap(listingController.index))   // everyone can see listings
   .post(
+    isLoggedIn,
+    isAdmin,                                // only admin can create
     upload.single("listing[image]"),
     validateListing,
-    isLoggedIn,
     asyncWrap(listingController.create)
   );
 
-// //trending villas
-// router.get("/", asyncWrap(listingController.trending));
+// ✅ New Route (comes BEFORE :id route to avoid CastError)
+router.get("/new", isLoggedIn, isAdmin, listingController.renderNewForm);
 
-// New Route
-router.get("/new", isLoggedIn, listingController.new);
-
-//Show, Update, Delete Routes
+// ✅ Show, Update, Delete Routes
 router
   .route("/:id")
-  .get(asyncWrap(listingController.show))
+  .get(asyncWrap(listingController.show))   // everyone can see villa details
   .put(
     isLoggedIn,
-    isOwner,
+    isAdmin,                                // only admin can edit
     upload.single("listing[image]"),
     validateListing,
     asyncWrap(listingController.update)
   )
-  .delete(isLoggedIn, isOwner, asyncWrap(listingController.destroy));
+  .delete(
+    isLoggedIn,
+    isAdmin,                                // only admin can delete
+    asyncWrap(listingController.destroy)
+  );
 
-//edit page
-router.get("/:id/edit", isLoggedIn, asyncWrap(listingController.edit));
+// ✅ Edit Page
+router.get(
+  "/:id/edit",
+  isLoggedIn,
+  isAdmin,
+  asyncWrap(listingController.edit)
+);
 
 module.exports = router;

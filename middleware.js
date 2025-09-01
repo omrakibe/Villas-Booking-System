@@ -3,6 +3,15 @@ const Review = require("./models/review.js");
 const { listingSchema, reviewSchema } = require("./schema.js");
 const expressError = require("./utils/expressError.js");
 
+module.exports.isAdmin = (req, res, next) => {
+  if (req.isAuthenticated() && req.user.role === "admin") {
+    return next();
+  }
+  req.flash("error", "Admins only!");
+  res.redirect("/listings");
+};
+
+
 //this function is used to see whether user is logged in or not
 module.exports.isLoggedIn = (req, res, next) => {
   // console.log(req.path, "..", req.originalUrl);
