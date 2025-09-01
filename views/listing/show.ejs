@@ -77,30 +77,39 @@
 
     <script src="/js/map.js"></script>
 
-    <!-- Booking Form (only for normal logged in users) -->
-    <% if (curUser && !(curUser._id.equals(listings.owner._id)) && curUser.email !== ADMIN_EMAIL) { %>
-      <hr /><hr />
-      <div class="col-8 offset-2 mb-5">
-        <h3>Book this Villa:</h3>
-        <form action="/listings/<%= listings._id %>/bookings" method="POST">
-  <div class="mb-3">
-    <label for="startDate">Check-In:</label>
-    <input type="date" name="startDate" required class="form-control">
-  </div>
-  <div class="mb-3">
-    <label for="endDate">Check-Out:</label>
-    <input type="date" name="endDate" required class="form-control">
-  </div>
-  <div class="mb-3">
-    <label for="guests">Guests:</label>
-    <input type="number" name="guests" min="1" value="1" required class="form-control">
-  </div>
-  <button type="submit" class="btn btn-success">Book Now</button>
-</form>
-
-
+    <!-- Booking Form / Book Now Button -->
+<% if (curUser && !(curUser._id.equals(listings.owner._id)) && curUser.email !== ADMIN_EMAIL) { %>
+  <!-- Logged in user (not admin, not owner) -->
+  <hr /><hr />
+  <div class="col-8 offset-2 mb-5">
+    <h3>Book this Villa:</h3>
+    <form action="/listings/<%= listings._id %>/bookings" method="POST">
+      <div class="mb-3">
+        <label for="startDate">Check-In:</label>
+        <input type="date" name="startDate" required class="form-control">
       </div>
-    <% } %>
+      <div class="mb-3">
+        <label for="endDate">Check-Out:</label>
+        <input type="date" name="endDate" required class="form-control">
+      </div>
+      <div class="mb-3">
+        <label for="guests">Guests:</label>
+        <input type="number" name="guests" min="1" value="1" required class="form-control">
+      </div>
+      <button type="submit" class="btn btn-success w-100">Book Now</button>
+    </form>
+  </div>
+
+<% } else if (!curUser) { %>
+  <!-- Not logged in -->
+  <hr /><hr />
+  <div class="col-8 offset-2 mb-5 text-center">
+    <h3>Book this Villa:</h3>
+    <a href="/login" class="btn btn-success w-50" style="background-color: black;">Book Now</a>
+    <p class="mt-2">Please <a href="/login">login</a> to book this villa.</p>
+  </div>
+<% } %>
+
 
     <!-- Reviews Section -->
     <% if (curUser) { %>
