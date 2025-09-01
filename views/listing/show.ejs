@@ -47,7 +47,7 @@
         <br>
         <!-- Buttons section -->
         <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-          <% if (curUser.email === ADMIN_EMAIL) { %>
+          <% if (curUser && curUser.email === ADMIN_EMAIL) { %>
             <!-- Admin or Owner can edit/delete -->
             <form action="/listings/<%= listings._id %>/edit" method="GET">
               <button id="edit_btn">Edit</button>
@@ -146,28 +146,41 @@
     <% } %>
 
     <% if(listings.reviews.length > 0) { %>
-      <hr />
-      <h3>Reviews :</h3>
-      <div class="row">
-        <% for (review of listings.reviews) { %>
-          <div class="card col-5 ms-5 mb-4 text-center">
-            <div class="card-body mt-3 mb-4">
-              <h4 class="card-title mb-3">@ <u><%= review.author.username %></u></h4>
-              <p class="card-text starability-result mb-3" data-rating="<%= review.rating %>"></p>
-              <h5>Comment: <u><b><%= review.comment %></b></u></h5>
+  <hr />
+  <h3>Reviews :</h3>
+  <div class="row">
+    <% for (let review of listings.reviews) { %>
+      <div class="card col-5 ms-5 mb-4 text-center">
+        <div class="card-body mt-3 mb-4">
 
-              <% if (curUser && curUser._id.equals(review.author._id)) {%>
-                <form
-                  action="/listings/<%= listings.id %>/reviews/<%= review.id %>?_method=DELETE"
-                  method="POST"
-                >
-                  <button class="mt-3">Delete</button>
-                </form>
-              <% } %>
-            </div>
-          </div>
-        <% } %>
+          <% if (review.author && review.author.username) { %>
+            <h4 class="card-title mb-3">@ <u><%= review.author.username %></u></h4>
+          <% } else { %>
+            <h4 class="card-title mb-3 text-danger">@ [Deleted User]</h4>
+          <% } %>
+
+          <p class="card-text starability-result mb-3" data-rating="<%= review.rating %>"></p>
+          <h5>Comment: <u><b><%= review.comment %></b></u></h5>
+
+          <% if (
+                curUser &&
+                (
+                  (review.author && curUser._id.equals(review.author._id)) ||
+                  (curUser.email === ADMIN_EMAIL)
+                )
+              ) { %>
+            <form
+              action="/listings/<%= listings.id %>/reviews/<%= review.id %>?_method=DELETE"
+              method="POST"
+            >
+              <button class="mt-3 btn btn-danger">Delete</button>
+            </form>
+          <% } %>
+        </div>
       </div>
     <% } %>
+  </div>
+<% } %>
+
   </div>
 </body>

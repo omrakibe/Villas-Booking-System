@@ -5,7 +5,7 @@ const expressError = require("../utils/expressError.js");
 const {
   isLoggedIn,
   validateReview,
-  isReviewAuthor,
+  isReviewAuthorOrAdmin,
 } = require("../middleware.js");
 
 //Controller
@@ -24,8 +24,9 @@ router.post(
 router.delete(
   "/:reviewId",
   isLoggedIn,
-  isReviewAuthor,
+  isReviewAuthorOrAdmin,
   asyncWrap(reviewController.destroyReview)
 );
+
 
 module.exports = router;

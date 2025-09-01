@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const Listing = require("./models/listing.js");
 const Review = require("./models/review.js");
 const { listingSchema, reviewSchema } = require("./schema.js");
@@ -63,13 +65,21 @@ module.exports.validateReview = (req, res, next) => {
   }
 };
 
-module.exports.isReviewAuthor = async (req, res, next) => {
-  let { id, reviewId } = req.params;
-  let review = await Review.findById(reviewId);
-  let listing = await Listing.findById(id);
-  if (!review.author.equals(res.locals.curUser._id)) {
-    req.flash("error", "You don't have access to delete Review");
-    return res.redirect(`/listings/${id}`);
+module.exports.isReviewAuthorOrAdmin = async (req, res, next) => {
+  const { id, reviewId } = req.params;
+  const review = await Review.findById(reviewId);
+
+  // Allow if current user is admin
+  if (req.user && req.user.email === process.env.ADMIN_EMAIL) {
+    return next();
   }
-  next();
+
+  // Allow if current user is the author
+  if (review && review.author && review.author.equals(req.user._id)) {
+    return next();
+  }
+
+  req.flash("error", "You don’t have permission to do that!");
+  return res.redirect(`/listings/${id}`);
 };
+
