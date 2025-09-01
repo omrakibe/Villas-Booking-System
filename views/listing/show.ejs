@@ -47,7 +47,7 @@
         <br>
         <!-- Buttons section -->
         <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-          <% if (curUser && (curUser._id.equals(listings.owner._id) || curUser.email === ADMIN_EMAIL)) { %>
+          <% if (curUser.email === ADMIN_EMAIL) { %>
             <!-- Admin or Owner can edit/delete -->
             <form action="/listings/<%= listings._id %>/edit" method="GET">
               <button id="edit_btn">Edit</button>
@@ -96,12 +96,11 @@
         <label for="guests">Guests:</label>
         <input type="number" name="guests" min="1" value="1" required class="form-control">
       </div>
-      <button type="submit" class="btn btn-success w-100">Book Now</button>
+      <button type="submit" class="btn btn-success w-20">Book Now</button>
     </form>
   </div>
 
 <% } else if (!curUser) { %>
-  <!-- Not logged in -->
   <hr /><hr />
   <div class="col-8 offset-2 mb-5 text-center">
     <h3>Book this Villa:</h3>
