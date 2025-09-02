@@ -94,7 +94,7 @@ router.post("/:id/confirm", isLoggedIn, async (req, res) => {
 
 
 // DELETE - Cancel booking
-router.delete("/:bookingId", isLoggedIn, async (req, res) => {
+router.delete("/:id", isLoggedIn, async (req, res) => {
   try {
     const { id } = req.params;
     await Booking.findByIdAndDelete(id);
