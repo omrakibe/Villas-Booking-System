@@ -3,19 +3,23 @@ const router = express.Router({ mergeParams: true });
 const wrapAsync = require("../utils/wrapAsync.js");
 const passport = require("passport");
 const { saveRedirectUrl } = require("../middleware.js");
-
-//controller
 const userController = require("../controler/user.js");
 
-//signupForm and signup Route
 router
   .route("/signup")
-  .get(async (req, res) => {
+  .get((req, res) => {
     res.render("users/signup.ejs");
   })
+
   .post(saveRedirectUrl, wrapAsync(userController.signUp));
 
-//loginForm and Login Route
+
+router.get("/verify-otp", userController.verifyOtpPage);
+
+
+router.post("/verify-otp", wrapAsync(userController.verifyOtp));
+
+
 router
   .route("/login")
   .get(userController.loginPage)
@@ -28,7 +32,7 @@ router
     userController.loginPost
   );
 
-//Logout route
+
 router.get("/logout", userController.logout);
 
 module.exports = router;

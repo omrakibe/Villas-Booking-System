@@ -1,0 +1,22 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+  <div class="card shadow-lg p-4 rounded-4" style="width: 28rem;">
+    <h2 class="text-center mb-4">Verify OTP</h2>
+
+    <form action="/verify-otp" method="POST">
+      <div class="mb-3">
+        <label for="otp" class="form-label">Enter OTP</label>
+        <input
+          type="text"
+          name="otp"
+          id="otp"
+          class="form-control"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn btn-dark w-100">Verify</button>
+    </form>
+  </div>
+</div>
