@@ -79,26 +79,87 @@
 
     <!-- Booking Form / Book Now Button -->
 <% if (curUser && !(curUser._id.equals(listings.owner._id)) && curUser.email !== ADMIN_EMAIL) { %>
-  <!-- Logged in user (not admin, not owner) -->
   <hr /><hr />
   <div class="col-8 offset-2 mb-5">
     <h3>Book this Villa:</h3>
-    <form action="/listings/<%= listings._id %>/bookings" method="POST">
-      <div class="mb-3">
-        <label for="startDate">Check-In:</label>
-        <input type="date" name="startDate" required class="form-control">
-      </div>
-      <div class="mb-3">
-        <label for="endDate">Check-Out:</label>
-        <input type="date" name="endDate" required class="form-control">
-      </div>
-      <div class="mb-3">
-        <label for="guests">Guests:</label>
-        <input type="number" name="guests" min="1" value="1" required class="form-control">
-      </div>
-      <button type="submit" class="btn btn-success w-20">Book Now</button>
-    </form>
+   <form action="/bookings/<%= listings._id %>" method="POST">
+  <div class="mb-3">
+    <label for="startDate">Check-In:</label>
+    <input type="date" name="startDate" required class="form-control">
   </div>
+  <div class="mb-3">
+    <label for="endDate">Check-Out:</label>
+    <input type="date" name="endDate" required class="form-control">
+  </div>
+  <div class="mb-3">
+    <label for="guests">Guests:</label>
+    <input type="number" name="guests" min="1" value="1" required class="form-control">
+  </div>
+  <button type="submit" class="btn btn-success">Book Now</button>
+</form>
+
+
+  </div>
+
+ <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+document.getElementById("rzp-button").onclick = async function (e) {
+  e.preventDefault();
+
+  const startDate = document.querySelector('input[name="startDate"]').value;
+  const endDate = document.querySelector('input[name="endDate"]').value;
+  const guests = document.querySelector('input[name="guests"]').value;
+  const amount = <%= listings.price %>;
+
+  // Create order in backend
+  const response = await fetch(`/bookings/<%= listings._id %>/pay`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount }),
+  });
+
+  const order = await response.json();
+
+  var options = {
+    key: "<%= process.env.RAZORPAY_KEY_ID %>",
+    amount: order.amount,
+    currency: "INR",
+    name: "GreatPark Villas",
+    description: "Booking Payment",
+    order_id: order.id,
+    prefill: {
+      name: "<%= curUser.username %>",
+      email: "<%= curUser.email %>",
+      contact: "<%= curUser.phone || '9999999999' %>"
+    },
+    notes: {
+      startDate,
+      endDate,
+      guests
+    },
+    theme: { color: "#3399cc" },
+    checkout: { disableOtp: true }, // disables OTP in test mode
+    handler: async function (response) {
+      // Confirm booking after payment
+      await fetch(`/bookings/<%= listings._id %>/confirm`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          startDate,
+          endDate,
+          guests,
+          payment_id: response.razorpay_payment_id
+        })
+      });
+      alert("Payment successful! Booking confirmed.");
+      window.location.href = "/bookings";
+    }
+  };
+
+  var rzp1 = new Razorpay(options);
+  rzp1.open();
+};
+</script>
 
 <% } else if (!curUser) { %>
   <hr /><hr />
@@ -108,6 +169,7 @@
     <p class="mt-2">Please <a href="/login">login</a> to book this villa.</p>
   </div>
 <% } %>
+
 
 
     <!-- Reviews Section -->
@@ -159,7 +221,10 @@
             <h4 class="card-title mb-3 text-danger">@ [Deleted User]</h4>
           <% } %>
 
-          <p class="card-text starability-result mb-3" data-rating="<%= review.rating %>"></p>
+          <div class="d-flex justify-content-center mb-4">
+  <p class="card-text starability-result" data-rating="<%= review.rating %>"></p>
+</div>
+
           <h5>Comment: <u><b><%= review.comment %></b></u></h5>
 
           <% if (

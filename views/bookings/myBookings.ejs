@@ -1,0 +1,65 @@
+<% layout("/layouts/boilerplate") %>
+
+<body>
+  <div class="container mt-5">
+    <h2 class="text-center mb-5">✨ Your Bookings ✨</h2>
+
+    <% if (bookings.length === 0) { %>
+      <div class="text-center">
+        <p class="fs-5 text-muted">No bookings found.</p>
+        <a href="/listings" class="btn btn-dark mt-3">Browse Villas</a>
+      </div>
+    <% } else { %>
+      <div class="row justify-content-center">
+        <% for (let booking of bookings) { %>
+          <div class="col-md-4 col-sm-6 mb-4 d-flex">
+            <div class="card shadow-lg border-0 rounded-4 w-100">
+              <img src="<%= booking.listing.image.url %>" 
+                   class="card-img-top rounded-top-4" 
+                   alt="Villa Image" 
+                   style="height: 14rem; object-fit: cover;" />
+
+              <div class="card-body text-center">
+                <h5 class="card-title fw-bold mb-3"><%= booking.listing.title %></h5>
+                
+                <p class="card-text mb-3">
+                  <span class="d-block"><b>Check-in:</b> <%= booking.startDate.toDateString() %></span>
+                  <span class="d-block"><b>Check-out:</b> <%= booking.endDate.toDateString() %></span>
+                  <span class="d-block"><b>Guests:</b> <%= booking.guests %></span>
+                </p>
+
+                <!-- Payment Status + Actions -->
+                <p class="mb-3">
+                  <% if (booking.paymentStatus === "Paid") { %>
+                    <span class="badge bg-success">✔ Paid</span>
+                  <% } else if (booking.paymentStatus === "Pending") { %>
+                    <span class="badge bg-warning text-dark">⏳ Pending</span>
+
+                    <!-- Pay Now button -->
+                    <form action="/payment/order/<%= booking.listing._id %>" method="POST">
+                      <input type="hidden" name="startDate" value="<%= booking.startDate.toISOString().slice(0,10) %>">
+                      <input type="hidden" name="endDate" value="<%= booking.endDate.toISOString().slice(0,10) %>">
+                      <input type="hidden" name="guests" value="<%= booking.guests %>">
+                      <input type="hidden" name="bookingId" value="<%= booking._id %>">
+                      <button type="submit" class="btn btn-success w-100 mt-2">💳 Pay Now</button>
+                    </form>
+
+                  <% } else { %>
+                    <span class="badge bg-danger">❌ Failed</span>
+                  <% } %>
+                </p>
+
+                <!-- Cancel button -->
+                <form action="/bookings/<%= booking._id %>?_method=DELETE" 
+                      method="POST" 
+                      onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                  <button class="btn btn-outline-danger w-100">Cancel Booking</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+</body>

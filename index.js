@@ -11,12 +11,19 @@ const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 
+app.use((req, res, next) => {
+  res.locals.curUser = req.user; 
+  res.locals.ADMIN_EMAIL = process.env.ADMIN_EMAIL; 
+  next();
+});
+
 // Routers
 const listingRouter = require("./routes/listings.js");
 const reviewRouter = require("./routes/reviews.js");
 const userRouter = require("./routes/authenticate.js");
-const adminRouter = require("./routes/admin.js"); // ✅ new
+const adminRouter = require("./routes/admin.js");
 const bookingRouter = require("./routes/bookings");
+const paymentRoutes = require("./routes/payment");
 
 const expressError = require("./utils/expressError.js");
 
@@ -69,6 +76,7 @@ const sessionOption = {
 
 app.use(session(sessionOption));
 app.use(flash());
+app.use(express.json());
 
 // Passport config
 app.use(passport.initialize());
@@ -105,8 +113,8 @@ app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
 app.use("/bookings", bookingRouter);
-app.use("/listings/:id/bookings", bookingRouter);
-
+// app.use("/listings/:id/bookings", bookingRouter);
+app.use("/payment", paymentRoutes);
 // 🔑 Admin-only routes
 app.use("/admin", isLoggedIn, isAdmin, adminRouter);
 

@@ -1,0 +1,61 @@
+<% layout("/layouts/boilerplate") %>
+
+<body>
+  <div class="container mt-5 text-center">
+    <h2 class="mb-4">Checkout</h2>
+
+    <div class="card shadow p-4 mx-auto" style="max-width: 500px;">
+      <h4><%= listing.title %></h4>
+      <img src="<%= listing.image.url %>" alt="villa" class="img-fluid rounded mb-3" style="height: 200px; object-fit: cover;">
+
+      <p><b>Amount:</b> ₹<%= (amount / 100).toLocaleString("en-IN") %></p>
+      <button id="rzp-button" class="btn btn-success btn-lg">Pay Now</button>
+    </div>
+  </div>
+
+  <!-- Razorpay SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    document.getElementById("rzp-button").onclick = function (e) {
+      e.preventDefault();
+
+      var options = {
+        key: "<%= key_id %>",
+        amount: "<%= amount %>",
+        currency: "<%= currency %>",
+        name: "GreatPark Villas",
+        description: "Villa Booking Payment",
+        order_id: "<%= orderId %>",
+
+        prefill: {
+          name: "<%= curUser.username %>",
+          email: "<%= curUser.email %>",
+          contact: "<%= curUser.phone || '9999999999' %>"
+        },
+
+        theme: { color: "#3399cc" },
+
+        handler: async function (response) {
+          // ✅ Confirm booking in backend after successful payment
+          await fetch(`/bookings/<%= listing._id %>/confirm`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+  razorpay_payment_id: response.razorpay_payment_id,
+  startDate: "<%= pendingBooking.startDate %>",
+  endDate: "<%= pendingBooking.endDate %>",
+  guests: "<%= pendingBooking.guests %>"
+})
+
+          });
+
+          alert("Payment successful ✅ Booking confirmed!");
+          window.location.href = "/bookings/my";
+        }
+      };
+
+      var rzp1 = new Razorpay(options);
+      rzp1.open();
+    };
+  </script>
+</body>
