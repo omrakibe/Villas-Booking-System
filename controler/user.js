@@ -26,7 +26,7 @@ module.exports.signUp = async (req, res) => {
       subject: "GreatPark Email Verification - OTP",
      html: `
         <h2>Welcome to GreatPark Villas ✨</h2>
-        <p>Hi <b>${username}</b>, Thank you for signing up with <b>GreatPark Villas</b></p>
+        <p>Hi <b>${username}</b>, Thank you for signing up with <b>GreatPark Villas 🏡</b></p>
         
         <p>To complete your signup, please verify your email address using the OTP below:</p>
 
@@ -37,7 +37,7 @@ module.exports.signUp = async (req, res) => {
         <p>If you did not request this, you can safely ignore this email.</p>
         <br>
         <p>Best regards, <br>
-        The GreatPark Team 🏡</p>
+        Om Rakibe</p>
       `,
     });
 
