@@ -9,7 +9,10 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
-    role: { type: String, enum: ["admin", "user"], default: "user" }
+    role: { type: String, enum: ["admin", "user"], default: "user" },
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
+
     // No need to define username and password because passport-local-mongoose will auto define it for us;
 
     // username: {

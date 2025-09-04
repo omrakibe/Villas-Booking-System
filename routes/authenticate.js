@@ -33,6 +33,19 @@ router
   );
 
 
+
 router.get("/logout", userController.logout);
+
+// Forgot Password - Enter Email
+router.get("/forgot-password", (req, res) => {
+  res.render("users/forgotPassword");
+});
+
+router.post("/forgot-password", userController.forgotPassword);
+
+// Reset Password Form
+router.get("/reset-password/:token", userController.resetPasswordPage);
+router.post("/reset-password/:token", userController.resetPassword);
+
 
 module.exports = router;

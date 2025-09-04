@@ -11,12 +11,6 @@ const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
 
-app.use((req, res, next) => {
-  res.locals.curUser = req.user; 
-  res.locals.ADMIN_EMAIL = process.env.ADMIN_EMAIL; 
-  next();
-});
-
 // Routers
 const listingRouter = require("./routes/listings.js");
 const reviewRouter = require("./routes/reviews.js");
@@ -31,25 +25,19 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const flash = require("connect-flash");
 const passport = require("passport");
-const localStrategy = require("passport-local");
+const LocalStrategy = require("passport-local").Strategy;
 const User = require("./models/user.js");
 
 // Middleware
 const { isLoggedIn, isAdmin } = require("./middleware.js");
 
-app.use((req, res, next) => {
-  res.locals.curUser = req.user; 
-  next();
-});
-
-
-// View engine & public
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
+app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
-app.engine("ejs", ejsMate);
+app.use(express.json());
 
 // Mongo Session Store
 const store = MongoStore.create({
@@ -76,16 +64,44 @@ const sessionOption = {
 
 app.use(session(sessionOption));
 app.use(flash());
-app.use(express.json());
 
 // Passport config
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new localStrategy(User.authenticate()));
+
+
+passport.use(
+  new LocalStrategy(
+    { usernameField: "usernameOrEmail" }, 
+    async (usernameOrEmail, password, done) => {
+      try {
+        
+        const user = await User.findOne({
+          $or: [{ email: usernameOrEmail }, { username: usernameOrEmail }],
+        });
+
+        if (!user) {
+          return done(null, false, { message: "Invalid username/email" });
+        }
+
+       
+        const { user: authenticatedUser, error } = await user.authenticate(password);
+        if (error || !authenticatedUser) {
+          return done(null, false, { message: "Invalid password" });
+        }
+
+        return done(null, authenticatedUser);
+      } catch (err) {
+        return done(err);
+      }
+    }
+  )
+);
+
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// Flash messages & current user middleware
+
 app.use((req, res, next) => {
   res.locals.successMsg = req.flash("success");
   res.locals.delMsg = req.flash("delete");
@@ -93,29 +109,29 @@ app.use((req, res, next) => {
   res.locals.revDel = req.flash("revDel");
   res.locals.errMsg = req.flash("error");
   res.locals.curUser = req.user;
+  res.locals.ADMIN_EMAIL = process.env.ADMIN_EMAIL;
   next();
 });
 
-// Mongo connection
+
 main()
   .then(() => console.log("Connected to DB"))
   .catch((err) => console.log(err));
 
 async function main() {
   await mongoose.connect(dbUrl, {
-    serverSelectionTimeoutMS: 20000, // 20 seconds
+    serverSelectionTimeoutMS: 20000, 
   });
 }
 
-// Routes
+
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
 app.use("/bookings", bookingRouter);
-// app.use("/listings/:id/bookings", bookingRouter);
 app.use("/payment", paymentRoutes);
-// 🔑 Admin-only routes
+
 app.use("/admin", isLoggedIn, isAdmin, adminRouter);
 
 app.get("/", (req, res) => {
