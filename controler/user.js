@@ -124,6 +124,7 @@ module.exports.forgotPassword = async (req, res) => {
     // Send email
     const resetURL = `http://${req.headers.host}/reset-password/${token}`;
     await transporter.sendMail({
+      from: `"GreatPark Villas" <${process.env.EMAIL_USER}>`,
       to: user.email,
       subject: "Password Reset - GreatPark",
       html: `
@@ -131,6 +132,10 @@ module.exports.forgotPassword = async (req, res) => {
         <p>You requested a password reset.</p>
         <p><a href="${resetURL}">Click here</a> to reset your password.</p>
         <p>This link expires in 15 minutes.</p>
+        <br>
+        <p>If you did not request this, you can safely ignore this email.</p>
+        <br>
+        <p>Thank you</p>
       `,
     });
 
