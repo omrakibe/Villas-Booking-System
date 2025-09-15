@@ -11,24 +11,21 @@ const bookingSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   guests: { type: Number, required: true },
 
-  
-  paymentId: String,
-  paymentStatus: {
-  type: String,
-  enum: ["Pending", "Paid", "Failed"],
-  default: "Pending"
-},
+  days: { type: Number, required: true },          
+  totalAmount: { type: Number, required: true },   
 
-  orderId: String,   // Razorpay order ID
+  orderId: String,                                  
+  paymentId: String,                               
   paymentStatus: {
     type: String,
     enum: ["Pending", "Paid", "Failed"],
     default: "Pending",
   },
-});
+}, { timestamps: true }); 
 
 module.exports = mongoose.model("Booking", bookingSchema);

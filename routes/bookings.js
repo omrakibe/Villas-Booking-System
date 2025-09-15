@@ -19,12 +19,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+
 // 📌 View My Bookings
 router.get("/my", isLoggedIn, async (req, res) => {
   try {
-    const bookings = await Booking.find({ user: req.user._id }).populate(
-      "listing"
-    );
+    const bookings = await Booking.find({ user: req.user._id }).populate("listing");
     res.render("bookings/myBookings", { bookings });
   } catch (err) {
     console.error(err);
@@ -33,6 +32,8 @@ router.get("/my", isLoggedIn, async (req, res) => {
   }
 });
 
+
+// 📌 Create Booking + Razorpay Order
 router.post("/:listingId", isLoggedIn, async (req, res) => {
   try {
     const { listingId } = req.params;
@@ -44,7 +45,18 @@ router.post("/:listingId", isLoggedIn, async (req, res) => {
       return res.redirect("/listings");
     }
 
-    const amount = listing.price * 100; // in paise
+    // ✅ Calculate days (inclusive of both start & end date)
+    const days =
+      (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+        (1000 * 60 * 60 * 24) + 1;
+
+    if (days <= 0) {
+      req.flash("error", "Invalid booking dates");
+      return res.redirect(`/listings/${listingId}`);
+    }
+
+    const totalAmount = listing.price * days;
+    const amount = totalAmount * 100; // in paise
 
     const order = await razorpay.orders.create({
       amount,
@@ -52,14 +64,8 @@ router.post("/:listingId", isLoggedIn, async (req, res) => {
       receipt: `receipt_${Date.now()}`,
     });
 
-    // ✅ Corrected: use listingId, not id
-    req.session.pendingBooking = {
-      listingId,
-      startDate,
-      endDate,
-      guests,
-      amount,
-    };
+    // Save booking temporarily in session
+    req.session.pendingBooking = { listingId, startDate, endDate, guests, days, totalAmount };
 
     res.render("payments/checkout", {
       orderId: order.id,
@@ -76,7 +82,8 @@ router.post("/:listingId", isLoggedIn, async (req, res) => {
   }
 });
 
-// ✅ Confirm Booking after successful Razorpay payment
+
+// 📌 Confirm Booking after Razorpay success
 router.post("/:id/confirm", isLoggedIn, async (req, res) => {
   try {
     const { id } = req.params; // listingId
@@ -88,100 +95,103 @@ router.post("/:id/confirm", isLoggedIn, async (req, res) => {
       return res.redirect("/listings");
     }
 
-    // Save confirmed booking
+    const days =
+      (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+        (1000 * 60 * 60 * 24) + 1;
+
+    const totalAmount = listing.price * days;
+
+    // Save booking
     const booking = new Booking({
       listing: listing._id,
       user: req.user._id,
       startDate,
       endDate,
       guests,
+      days,
+      totalAmount,
       paymentId: razorpay_payment_id,
       paymentStatus: "Paid",
     });
 
     await booking.save();
 
-    const mailOptions = {
+    // 📧 Send confirmation email
+    await transporter.sendMail({
       from: `"GreatPark Villas" <${process.env.EMAIL_USER}>`,
       to: req.user.email,
       subject: "🏡 Your GreatPark Villa Booking is Confirmed!",
       html: `
-    <div style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px;">
-      <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-        
-        <div style="text-align: center; margin-bottom: 20px;">
-      
-          <h2 style="color: #2c3e50;">GreatPark</h2>
-          <p style="color: #27ae60; font-size: 18px;">Your booking is confirmed 🎉</p>
+        <div style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px;">
+          <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            
+            <div style="text-align: center; margin-bottom: 20px;">
+              <h2 style="color: #2c3e50;">GreatPark</h2>
+              <p style="color: #27ae60; font-size: 18px;">Your booking is confirmed 🎉</p>
+            </div>
+
+            <p style="font-size: 16px; color: #444;">Hello <b>${req.user.username}</b>,</p>
+            <p style="font-size: 16px; color: #444;">
+              Thank you for booking with <b>GreatPark</b>. Here are your booking details:
+            </p>
+
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+              <tr style="background: #f3f3f3;">
+                <td style="padding: 10px; font-weight: bold;">Villa</td>
+                <td style="padding: 10px;">${listing.title}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; font-weight: bold;">Location</td>
+                <td style="padding: 10px;">${listing.location}, ${listing.country}</td>
+              </tr>
+              <tr style="background: #f3f3f3;">
+                <td style="padding: 10px; font-weight: bold;">Check-in</td>
+                <td style="padding: 10px;">${new Date(startDate).toDateString()}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; font-weight: bold;">Check-out</td>
+                <td style="padding: 10px;">${new Date(endDate).toDateString()}</td>
+              </tr>
+              <tr style="background: #f3f3f3;">
+                <td style="padding: 10px; font-weight: bold;">Days</td>
+                <td style="padding: 10px;">${days}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; font-weight: bold;">Guests</td>
+                <td style="padding: 10px;">${guests}</td>
+              </tr>
+              <tr>
+                <td style="padding: 10px; font-weight: bold;">Total Price</td>
+                <td style="padding: 10px; color: #27ae60;"><b>₹${totalAmount.toLocaleString("en-IN")}</b></td>
+              </tr>
+            </table>
+
+            <div style="margin-top: 25px; text-align: center;">
+              <a href="https://villas-booking-system.onrender.com/bookings/my" 
+                style="background: #27ae60; color: white; padding: 12px 20px; border-radius: 5px; text-decoration: none; font-size: 16px;">
+                View My Booking
+              </a>
+            </div>
+
+            <p style="margin-top: 25px; font-size: 14px; color: #777; text-align: center;">
+              We look forward to hosting you! 🏖 <br/>
+              – The <b>Om Rakibe & Team</b>
+            </p>
+          </div>
         </div>
-
-        <p style="font-size: 16px; color: #444;">Hello <b>${
-          req.user.username
-        }</b>,</p>
-        <p style="font-size: 16px; color: #444;">
-          Thank you for booking with <b>GreatPark</b>. Here are your booking details:
-        </p>
-
-        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-          <tr style="background: #f3f3f3;">
-            <td style="padding: 10px; font-weight: bold;">Villa</td>
-            <td style="padding: 10px;">${listing.title}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; font-weight: bold;">Location</td>
-            <td style="padding: 10px;">${listing.location}, ${
-        listing.country
-      }</td>
-          </tr>
-          <tr style="background: #f3f3f3;">
-            <td style="padding: 10px; font-weight: bold;">Check-in</td>
-            <td style="padding: 10px;">${new Date(
-              startDate
-            ).toDateString()}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; font-weight: bold;">Check-out</td>
-            <td style="padding: 10px;">${new Date(endDate).toDateString()}</td>
-          </tr>
-          <tr style="background: #f3f3f3;">
-            <td style="padding: 10px; font-weight: bold;">Guests</td>
-            <td style="padding: 10px;">${guests}</td>
-          </tr>
-          <tr>
-            <td style="padding: 10px; font-weight: bold;">Payment Status</td>
-            <td style="padding: 10px; color: #27ae60;"><b>✔ Paid</b></td>
-          </tr>
-        </table>
-
-        <div style="margin-top: 25px; text-align: center;">
-          <a href="https://villas-booking-system.onrender.com/bookings/my" 
-             style="background: #27ae60; color: white; padding: 12px 20px; border-radius: 5px; text-decoration: none; font-size: 16px;">
-             View My Booking
-          </a>
-        </div>
-
-        <p style="margin-top: 25px; font-size: 14px; color: #777; text-align: center;">
-          We look forward to hosting you! 🏖 <br/>
-          – The <b>Om Rakibe and </b> Team
-        </p>
-      </div>
-    </div>
-  `,
-    };
-
-    await transporter.sendMail(mailOptions);
+      `,
+    });
 
     req.flash("success", "Booking confirmed! 🎉");
     res.json({ success: true });
   } catch (err) {
     console.error(err);
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to confirm booking" });
+    res.status(500).json({ success: false, message: "Failed to confirm booking" });
   }
 });
 
-// DELETE - Cancel booking
+
+// 📌 Cancel Booking
 router.delete("/:id", isLoggedIn, async (req, res) => {
   try {
     const { id } = req.params; // bookingId
@@ -192,73 +202,73 @@ router.delete("/:id", isLoggedIn, async (req, res) => {
       return res.redirect("/bookings/my");
     }
 
-    const { listing, startDate, endDate } = booking;
-
     await Booking.findByIdAndDelete(id);
 
-    // Send cancellation email
+    // 📧 Send cancellation email with refund info
     await transporter.sendMail({
       from: `"GreatPark Villas" <${process.env.EMAIL_USER}>`,
       to: req.user.email,
       subject: "⚠️ Your Villa Booking Has Been Cancelled",
-      html: `<div style="font-family: Arial, sans-serif; background: #f4f6f8; padding: 20px;">
-  <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-    
-    <div style="text-align: center; margin-bottom: 25px;">
-      <img src="https://img.icons8.com/color/96/000000/cancel.png" alt="Cancelled" style="width: 70px;" />
-      <h2 style="color: #e74c3c; margin-top: 10px;">Booking Cancelled</h2>
-      <p style="color: #e74c3c; font-size: 18px;">We’re sorry to see you go 😔</p>
-    </div>
+      html: `
+        <div style="font-family: Arial, sans-serif; background: #f4f6f8; padding: 20px;">
+          <div style="max-width: 600px; margin: auto; background: white; border-radius: 10px; padding: 30px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            
+            <div style="text-align: center; margin-bottom: 25px;">
+              <img src="https://img.icons8.com/color/96/000000/cancel.png" alt="Cancelled" style="width: 70px;" />
+              <h2 style="color: #e74c3c; margin-top: 10px;">Booking Cancelled</h2>
+              <p style="color: #e74c3c; font-size: 18px;">We’re sorry to see you go 😔</p>
+            </div>
 
-    <p style="font-size: 16px; color: #444;">Hello <b>${req.user.username}</b>,</p>
-    <p style="font-size: 16px; color: #444;">
-      Your booking with <b>GreatPark </b> has been successfully cancelled.  
-      Below were the details of your booking:
-    </p>
+            <p style="font-size: 16px; color: #444;">Hello <b>${req.user.username}</b>,</p>
+            <p style="font-size: 16px; color: #444;">
+              Your booking has been successfully cancelled. Here were the details:
+            </p>
 
-    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-      <tr style="background: #f9f9f9;">
-        <td style="padding: 12px; font-weight: bold;">Villa</td>
-        <td style="padding: 12px;">${booking.listing.title}</td>
-      </tr>
-      <tr>
-        <td style="padding: 12px; font-weight: bold;">Location</td>
-        <td style="padding: 12px;">${booking.listing.location}, ${booking.listing.country}</td>
-      </tr>
-      <tr style="background: #f9f9f9;">
-        <td style="padding: 12px; font-weight: bold;">Check-in</td>
-        <td style="padding: 12px;">${new Date(booking.startDate).toDateString()}</td>
-      </tr>
-      <tr>
-        <td style="padding: 12px; font-weight: bold;">Check-out</td>
-        <td style="padding: 12px;">${new Date(booking.endDate).toDateString()}</td>
-      </tr>
-      <tr style="background: #f9f9f9;">
-        <td style="padding: 12px; font-weight: bold;">Guests</td>
-        <td style="padding: 12px;">${booking.guests}</td>
-      </tr>
-    </table>
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+              <tr style="background: #f9f9f9;">
+                <td style="padding: 12px; font-weight: bold;">Villa</td>
+                <td style="padding: 12px;">${booking.listing.title}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; font-weight: bold;">Check-in</td>
+                <td style="padding: 12px;">${new Date(booking.startDate).toDateString()}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; font-weight: bold;">Check-out</td>
+                <td style="padding: 12px;">${new Date(booking.endDate).toDateString()}</td>
+              </tr>
+              <tr style="background: #f9f9f9;">
+                <td style="padding: 12px; font-weight: bold;">Guests</td>
+                <td style="padding: 12px;">${booking.guests}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; font-weight: bold;">Total Paid</td>
+                <td style="padding: 12px;">₹${booking.totalAmount.toLocaleString("en-IN")}</td>
+              </tr>
+            </table>
 
-    <div style="margin: 20px 0; padding: 15px; background: #fdf3f3; border: 1px solid #f5c6cb; border-radius: 6px;">
-      <p style="margin: 0; font-size: 15px; color: #e74c3c;">
-        💰 A refund has been initiated to your original payment method.  
-        It may take <b>5–7 business days</b> to reflect in your account depending on your bank.
-      </p>
-    </div>
+            <div style="margin: 20px 0; padding: 15px; background: #fdf3f3; border: 1px solid #f5c6cb; border-radius: 6px;">
+              <p style="margin: 0; font-size: 15px; color: #e74c3c;">
+                💰 A refund of <b>₹${booking.totalAmount.toLocaleString("en-IN")}</b> 
+                has been initiated to your original payment method.  
+                It may take <b>5–7 business days</b> to reflect in your account depending on your bank.
+              </p>
+            </div>
 
-    <div style="text-align: center; margin-top: 25px;">
-      <a href="https://villas-booking-system.onrender.com/listings" 
-         style="background: #3498db; color: white; padding: 12px 25px; border-radius: 6px; text-decoration: none; font-size: 16px;">
-         Browse More Villas
-      </a>
-    </div>
+            <div style="text-align: center; margin-top: 25px;">
+              <a href="https://villas-booking-system.onrender.com/listings" 
+                style="background: #3498db; color: white; padding: 12px 25px; border-radius: 6px; text-decoration: none; font-size: 16px;">
+                Browse More Villas
+              </a>
+            </div>
 
-    <p style="margin-top: 25px; font-size: 14px; color: #777; text-align: center;">
-      We hope to see you again at GreatPark 🌴<br/>
-      – The <b>Om Rakibe & Team</b>
-    </p>
-  </div>
-</div>`,
+            <p style="margin-top: 25px; font-size: 14px; color: #777; text-align: center;">
+              We hope to see you again at GreatPark 🌴<br/>
+              – The <b>Om Rakibe & Team</b>
+            </p>
+          </div>
+        </div>
+      `,
     });
 
     req.flash("success", "Booking cancelled");
@@ -269,5 +279,6 @@ router.delete("/:id", isLoggedIn, async (req, res) => {
     res.redirect("/bookings/my");
   }
 });
+
 
 module.exports = router;
