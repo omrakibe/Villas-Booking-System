@@ -154,7 +154,7 @@ router.post("/:id/confirm", isLoggedIn, async (req, res) => {
         </table>
 
         <div style="margin-top: 25px; text-align: center;">
-          <a href="http://localhost:8000/bookings/my" 
+          <a href="https://villas-booking-system.onrender.com/bookings/my" 
              style="background: #27ae60; color: white; padding: 12px 20px; border-radius: 5px; text-decoration: none; font-size: 16px;">
              View My Booking
           </a>
@@ -247,7 +247,7 @@ router.delete("/:id", isLoggedIn, async (req, res) => {
     </div>
 
     <div style="text-align: center; margin-top: 25px;">
-      <a href="http://localhost:8000/listings" 
+      <a href="https://villas-booking-system.onrender.com/listings" 
          style="background: #3498db; color: white; padding: 12px 25px; border-radius: 6px; text-decoration: none; font-size: 16px;">
          Browse More Villas
       </a>
